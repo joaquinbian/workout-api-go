@@ -2,6 +2,14 @@ package main
 
 import "fmt"
 
+/*
+
+	formatters:
+	- %s -> strings
+	- %d -> digitos (int..)
+	- %t -> booleanos
+*/
+
 func main() {
 
 	var name string = "Joaquin"
