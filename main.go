@@ -76,7 +76,52 @@ func main() {
 	add(2, 3)
 	s, p := calcSumAndProduct(3, 3)
 
-	fmt.Printf("los resultados de la suma y multiplicacion de 3 y 3 son: suma: %d, mult: %d", s, p)
+	fmt.Printf("los resultados de la suma y multiplicacion de 3 y 3 son: suma: %d, mult: %d\n", s, p)
+
+	fmt.Println("********* SWITCHES *********")
+	//switches
+	day := "Miercoles"
+
+	switch day {
+	case "Lunes":
+		fmt.Println("Comienza la semana... :(")
+	case "Martes", "Miercoles", "Jueves": //esta es una de las formas de evaluar multiples casos
+		fmt.Println("Sobreviviendo....")
+	case "VIernes":
+		fmt.Println("It's Friday dayyyy")
+	default:
+		fmt.Println("Sabado o domingo")
+
+	}
+
+	//FORLOOPs
+	fmt.Println("********** FOR LOOPS **********")
+
+	for i := 0; i < 5; i++ {
+		fmt.Printf("Iteracion %d\n", i+1)
+	}
+
+	//WHILE
+	//no existe el while, es un for solo con la condicion
+	count := 0
+	for count < 5 {
+		fmt.Println("El counter del while en", count)
+		count++
+	}
+
+	/*
+		//infinite loop
+		for{
+			//corre hasta que cumpla alguna condicion y le damos al break
+			break
+		}
+	*/
+
+	//arrays y slices
+	numbers := [5]int{1, 2, 3, 4, 5}
+	fmt.Println("El array es", numbers, "tiene una longitud de ", len(numbers))
+	//no se pueden agregar mas elementos que los 5, ni programaticamente
+	//no podemos hacer numbers[5] = 6
 }
 
 func add(a int, b int) int {
