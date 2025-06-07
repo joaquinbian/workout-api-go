@@ -122,6 +122,19 @@ func main() {
 	fmt.Println("El array es", numbers, "tiene una longitud de ", len(numbers))
 	//no se pueden agregar mas elementos que los 5, ni programaticamente
 	//no podemos hacer numbers[5] = 6
+
+	//slice
+	//puede ser: un array dinamico o una porcion (slice) de un array
+	//array dinamico: nos permite agregar elementos y si exceden su capacidad, la duplica
+	//para crear un slice a partir de otro slice usamos la sintaxis [inicio:final]
+
+	//convertimos el array numbers en un slice
+	numbersSlice := numbers[:]
+	//creamos un slice con los primeros 3 numeros
+	firstThree := numbers[:3]
+
+	fmt.Println("Numbers slice", numbersSlice)
+	fmt.Println("First three", firstThree)
 }
 
 func add(a int, b int) int {
