@@ -226,4 +226,42 @@ func structs() {
 
 	//para logear tmb las keys agregamos el + al formatter
 	fmt.Printf("Este soy yo %+v\n", yo) //{Name:Joaquin Age:24}
+
+	//anonymous struct
+	empleado := struct {
+		name string
+		id   int
+	}{
+		name: "Joaco",
+		id:   12,
+	}
+
+	fmt.Printf("Este soy yo empleado%v\n", empleado)         //{Joaco 12}
+	fmt.Printf("Este soy yo empleado + keys%+v\n", empleado) //{name:Joaco id:12}
+
+	//cuando pasamos un struct a una funcion, lo pasamos por valor(pasamos una copia a nuestra funcion)
+	//y esa copia vive solo en el ambiente de nuestra funcion, esa memoria se libera luego
+	//tambien podemos pasar una referencia a un struct e incluso esa se puede modificar
+
+	type Address struct {
+		street string
+		city   string
+	}
+
+	type Contact struct {
+		name    string
+		address Address
+		phone   string
+	}
+
+	//se pueden omitir valores al crear un struct gracias a los zero values
+	contact := Contact{
+		name: "Juan",
+		address: Address{
+			street: "Calle falsa 123",
+			city:   "Ciudad",
+		},
+	}
+
+	fmt.Printf("Este es mi contacto %v", contact)
 }
