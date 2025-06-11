@@ -28,10 +28,10 @@ func (p *Player) DropItem(name string) {
 				p.Inventory = append(p.Inventory[:idx], p.Inventory[:idx+1]...)
 			}
 
-			fmt.Printf("Player %s dropped an %s item: %s\n", p.Name, itemDropped.Type, itemDropped.Name)
 			return
 		}
 	}
+	fmt.Printf("Player %s dropped an %s item: %s\n", p.Name, itemDropped.Type, itemDropped.Name)
 
 }
 
