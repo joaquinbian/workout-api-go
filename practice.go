@@ -17,6 +17,8 @@ type Person struct {
 }
 
 // method receiver
+// la sintaxis de (x Struct) hace que sea un metodo de los strcuts
+// dependiendo que querramos hacer, podemos usar un puntero o solo una copia
 func (p *Person) modifyPersonName(name string) {
 	p.Name = name
 }
