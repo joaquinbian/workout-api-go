@@ -1,6 +1,8 @@
 package exercise
 
-import "fmt"
+import (
+	"fmt"
+)
 
 type Item struct {
 	Name string
@@ -14,7 +16,7 @@ type Player struct {
 
 func (p *Player) PickUpItem(i Item) {
 	p.Inventory = append(p.Inventory, i)
-	fmt.Printf("Player %s picked up an %s item: %s", p.Name, i.Type, i.Name)
+	fmt.Printf("El jugador %s agarro un item de tipo %s: %s", p.Name, i.Type, i.Name)
 }
 
 func (p *Player) DropItem(name string) {
@@ -31,10 +33,30 @@ func (p *Player) DropItem(name string) {
 			return
 		}
 	}
-	fmt.Printf("Player %s dropped an %s item: %s\n", p.Name, itemDropped.Type, itemDropped.Name)
+	fmt.Printf("El jugador %s dejo un item de tipo %s: %s\n", p.Name, itemDropped.Type, itemDropped.Name)
 
 }
 
 func (p Player) UseItem(name string) {
 
+	if p.hasItem(name) {
+		fmt.Printf("El jugador %s decidio usar %s!\n", p.Name, name)
+		if name == "poison" {
+			p.DropItem(name)
+		}
+	} else {
+		fmt.Println("No tienes el item ", name)
+	}
+}
+
+func (p Player) hasItem(name string) bool {
+	found := false
+	for _, item := range p.Inventory {
+		if item.Name == name {
+			found = true
+
+		}
+
+	}
+	return found
 }
