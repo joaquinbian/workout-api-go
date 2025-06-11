@@ -54,7 +54,7 @@ func (p Player) hasItem(name string) bool {
 	for _, item := range p.Inventory {
 		if item.Name == name {
 			found = true
-
+			break
 		}
 
 	}
