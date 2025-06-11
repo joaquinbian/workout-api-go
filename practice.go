@@ -1,16 +1,29 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+)
 
 /*
-
-	formatters:
-	- %s -> strings
-	- %d -> digitos (int..)
-	- %f -> float
-	- %t -> booleanos
+formatters:
+- %s -> strings
+- %d -> digitos (int..)
+- %f -> float
+- %t -> booleanos
 */
+type Person struct {
+	Name string
+	Age  int
+}
 
+// method receiver
+func (p *Person) modifyPersonName(name string) {
+	p.Name = name
+}
+
+func (p Person) sayName() {
+	fmt.Printf("Mi nombre es %s\n", p.Name)
+}
 func SomePractice() {
 
 	var name string = "Joaquin"
@@ -212,11 +225,6 @@ func calcSumAndProduct(a, b int) (int, int) {
 
 func structs() {
 
-	type Person struct {
-		Name string
-		Age  int
-	}
-
 	yo := Person{
 		Name: "Joaquin",
 		Age:  24,
@@ -263,5 +271,34 @@ func structs() {
 		},
 	}
 
-	fmt.Printf("Este es mi contacto %v", contact)
+	fmt.Printf("Este es mi contacto %v\n", contact)
+
+	//PUNTEROS Y COPIAS, PASAR POR REFERNCIA VS VALOR
+
+	//con el &accedemos a la direccion de memoria de la variable
+	//con el *tipo decimos que vamos a manejar un puntero, que en esa variable
+	//guardaremos una dir de memoria
+	fmt.Printf("Nombre antes de pasar a la funcion: %s\n", yo.Name)
+	modifyPersonName(&yo, "Joaquin Fidel")
+	fmt.Printf("Nombre depsues de pasar a la funcion %s\n", yo.Name)
+
+	x := 20
+	//var xp *int = &x
+	xp := &x
+
+	fmt.Printf("Valor de x: %d y direccion de x: %p\n", x, xp)
+
+	//derefernce
+	//accedemos al valor del puntero para cambiarlo
+	*xp = 30
+
+	fmt.Printf("Valor de x: %d y direccion de x: %p\n", x, xp)
+
+	//methods receivers, metodos de un struct
+	yo.modifyPersonName("JoaquinBian")
+	yo.sayName()
+}
+
+func modifyPersonName(p *Person, name string) {
+	p.Name = name
 }
