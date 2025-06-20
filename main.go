@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"net/http"
 	"time"
@@ -9,6 +10,10 @@ import (
 )
 
 func main() {
+
+	var port int
+	flag.IntVar(&port, "port", 8080, "Server port")
+	flag.Parse()
 
 	app, err := app.NewApplication()
 
@@ -21,17 +26,17 @@ func main() {
 		panic(err)
 	}
 
-	app.Logger.Println("App is up!")
-
 	//primero registramos todos los handlers, luego escuchamos con ListenAndServe
 	//de esta forma bindeamos paths con function handlers en nuestro server
 	http.HandleFunc("/health", HealthCheck)
 
 	server := &http.Server{
-		Addr:        ":8080",
+		Addr:        fmt.Sprintf(":%d", port),
 		IdleTimeout: time.Minute,
 		ReadTimeout: 10 * time.Second,
 	}
+
+	app.Logger.Printf("App is up and listening on port %d", port)
 
 	err = server.ListenAndServe()
 
