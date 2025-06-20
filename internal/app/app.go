@@ -1,7 +1,9 @@
 package app
 
 import (
+	"fmt"
 	"log"
+	"net/http"
 	"os"
 )
 
@@ -20,4 +22,13 @@ func NewApplication() (*Application, error) {
 	}
 
 	return app, nil
+}
+
+func (a *Application) HealthCheck(w http.ResponseWriter, r *http.Request) {
+	//w: interface usada por HTTP handlers para crear respuestas HTTP
+	//	con el contestamos al cliente
+
+	//r: HTTP request recibida por el servidor, lo que nos envia el cliente
+
+	fmt.Fprintln(w, "Server is up and running")
 }

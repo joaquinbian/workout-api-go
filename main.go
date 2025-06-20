@@ -7,11 +7,14 @@ import (
 	"time"
 
 	"github.com/joaquinbian/workout-api-go/internal/app"
+	"github.com/joaquinbian/workout-api-go/internal/routes"
 )
 
 func main() {
 
 	var port int
+
+	//nos deja pasarle el puerto mediante la flag -port y la guarda en la variable port
 	flag.IntVar(&port, "port", 8080, "Server port")
 	flag.Parse()
 
@@ -28,10 +31,11 @@ func main() {
 
 	//primero registramos todos los handlers, luego escuchamos con ListenAndServe
 	//de esta forma bindeamos paths con function handlers en nuestro server
-	http.HandleFunc("/health", HealthCheck)
+	routerHandler := routes.SetupRoutes(app)
 
 	server := &http.Server{
 		Addr:        fmt.Sprintf(":%d", port),
+		Handler:     routerHandler,
 		IdleTimeout: time.Minute,
 		ReadTimeout: 10 * time.Second,
 	}
@@ -44,14 +48,4 @@ func main() {
 		app.Logger.Fatalln("We couldnt spin up our server ")
 	}
 
-}
-
-// http handler
-func HealthCheck(w http.ResponseWriter, r *http.Request) {
-	//w: interface usada por HTTP handlers para crear respuestas HTTP
-	//	con el contestamos al cliente
-
-	//r: HTTP request recibida por el servidor, lo que nos envia el cliente
-
-	fmt.Fprintln(w, "Server is up and running")
 }
