@@ -6,7 +6,7 @@ import (
 )
 
 func SetupRoutes(app *app.Application) *chi.Mux {
-	r := chi.NewMux()
+	r := chi.NewRouter()
 
 	r.Get("/health", app.HealthCheck)
 
