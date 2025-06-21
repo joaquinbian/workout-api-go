@@ -5,10 +5,13 @@ import (
 	"log"
 	"net/http"
 	"os"
+
+	"github.com/joaquinbian/workout-api-go/internal/api"
 )
 
 type Application struct {
-	Logger *log.Logger
+	Logger         *log.Logger
+	WorkoutHandler *api.WorkoutHandler
 }
 
 func NewApplication() (*Application, error) {
@@ -17,8 +20,14 @@ func NewApplication() (*Application, error) {
 	//con logger se puede manejar mejor diferentes tipos de logs como errores, logs para debugging, etc
 	logger := log.New(os.Stdout, "", log.Ldate|log.Ltime|log.Lshortfile)
 
+	//store
+
+	//handlers
+	workoutHandler := api.NewWorkoutHandler()
+
 	app := &Application{
-		Logger: logger,
+		Logger:         logger,
+		WorkoutHandler: workoutHandler,
 	}
 
 	return app, nil
