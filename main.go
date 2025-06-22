@@ -29,6 +29,8 @@ func main() {
 		panic(err)
 	}
 
+	defer app.DB.Close()
+
 	//primero registramos todos los handlers, luego escuchamos con ListenAndServe
 	//de esta forma bindeamos paths con function handlers en nuestro server
 	routerHandler := routes.SetupRoutes(app)
