@@ -9,6 +9,7 @@ import (
 
 	"github.com/joaquinbian/workout-api-go/internal/api"
 	"github.com/joaquinbian/workout-api-go/internal/store"
+	"github.com/joaquinbian/workout-api-go/migrations"
 )
 
 type Application struct {
@@ -28,7 +29,11 @@ func NewApplication() (*Application, error) {
 	if err != nil {
 		return nil, err
 	}
+	err = store.MigrateFS(db, migrations.FS, ".")
 
+	if err != nil {
+		panic(err)
+	}
 	//handlers
 	workoutHandler := api.NewWorkoutHandler()
 
