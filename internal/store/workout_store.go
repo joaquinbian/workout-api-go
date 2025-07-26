@@ -45,11 +45,46 @@ func (pg *PostgresWorkoutStore) CreateWorkout(w *Workout) (*Workout, error) {
 		return nil, err
 	}
 
+	//siempre llamamos a rollback, pq tx en su estado interno colecciona
+	//el estado de las trasnacciones activas, en caso de que detecte un error
+	//hace rollback
 	defer tx.Rollback()
 
 	query := `INSERT INTO workouts (title, description, duration_minutes, calories_burned)
 	VALUES($1, $2, $3, $4)
 	RETURNING id
 	`
-	//err = tx.QueryRow(query, w.Title, w.Description, w.DurationMinutes, w.CaloriesBurned)
+	//Scan es el mecanismo que copia y convierte las columnas de la query en tus variables Go.
+	//En .Scan(&w.ID) cada argumento debe ser un puntero a la variable donde querés guardar la columna.
+	err = tx.QueryRow(query, w.Title, w.Description, w.DurationMinutes, w.CaloriesBurned).Scan(&w.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, entry := range w.Entries {
+		query := `INSERT INTO workout_entries (workout_id, exercise_name, sets, reps, duration_seconds, weight, notes, order_index)
+    VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+    RETURNING id
+    `
+		err = tx.QueryRow(query, entry.ID, entry.ExerciseName, entry.Sets, entry.Reps, entry.DurationSeconds, entry.Weight, entry.Notes, entry.OrderIndex).Scan(&entry.ID)
+
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	err = tx.Commit()
+
+	if err != nil {
+		return nil, err
+	}
+
+	return w, nil
+
+}
+
+func (pg *PostgresWorkoutStore) GetWorkoutByID(id int64) (*Workout, error) {
+	w := &Workout{}
+
+	return w, nil
 }
