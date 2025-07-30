@@ -46,7 +46,7 @@ func (wh *WorkoutHandler) CreateWorkout(w http.ResponseWriter, r *http.Request) 
 
 	if err != nil {
 		fmt.Println(err) //luego lo mejoramos
-		http.Error(w, "No pudimos procesar su solicitud", http.StatusInternalServerError)
+		http.Error(w, "No pudimos procesar su solicitud. Formato incorrecto", http.StatusInternalServerError)
 		return
 	}
 

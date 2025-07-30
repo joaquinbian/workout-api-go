@@ -1,6 +1,9 @@
 package store
 
-import "database/sql"
+import (
+	"database/sql"
+	"fmt"
+)
 
 type Workout struct {
 	ID              int            `json:"id"`
@@ -66,9 +69,10 @@ func (pg *PostgresWorkoutStore) CreateWorkout(w *Workout) (*Workout, error) {
     VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
     RETURNING id
     `
-		err = tx.QueryRow(query, entry.ID, entry.ExerciseName, entry.Sets, entry.Reps, entry.DurationSeconds, entry.Weight, entry.Notes, entry.OrderIndex).Scan(&entry.ID)
+		err = tx.QueryRow(query, w.ID, entry.ExerciseName, entry.Sets, entry.Reps, entry.DurationSeconds, entry.Weight, entry.Notes, entry.OrderIndex).Scan(&entry.ID)
 
 		if err != nil {
+			fmt.Print(err)
 			return nil, err
 		}
 	}
