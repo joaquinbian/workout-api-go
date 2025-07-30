@@ -41,6 +41,7 @@ func (wh *WorkoutHandler) GetWorkoutByID(w http.ResponseWriter, r *http.Request)
 func (wh *WorkoutHandler) CreateWorkout(w http.ResponseWriter, r *http.Request) {
 	var workout store.Workout
 
+	//decodea el body (data) en el struct de workout
 	err := json.NewDecoder(r.Body).Decode(&workout)
 
 	if err != nil {

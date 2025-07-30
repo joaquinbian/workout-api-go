@@ -34,7 +34,9 @@ func NewApplication() (*Application, error) {
 	if err != nil {
 		panic(err)
 	}
+
 	workoutStore := store.NewPostgresWorkoutStore(db)
+
 	//handlers
 	workoutHandler := api.NewWorkoutHandler(workoutStore)
 
