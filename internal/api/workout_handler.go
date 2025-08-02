@@ -68,3 +68,16 @@ func (wh *WorkoutHandler) CreateWorkout(w http.ResponseWriter, r *http.Request) 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(createdWorkout)
 }
+
+func (wh *WorkoutHandler) GetWorkouts(w http.ResponseWriter, r *http.Request) {
+
+	workouts, err := wh.workoutStore.GetWorkouts()
+
+	if err != nil {
+		http.Error(w, "no pudimos procesar su solicitud", http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(workouts)
+}

@@ -39,7 +39,7 @@ func NewPostgresWorkoutStore(db *sql.DB) *PostgresWorkoutStore {
 type WorkoutStore interface {
 	CreateWorkout(*Workout) (*Workout, error)
 	GetWorkoutByID(id int64) (*Workout, error)
-	//GetWorkouts() ([]*Workout, error)
+	GetWorkouts() ([]Workout, error)
 }
 
 func (pg *PostgresWorkoutStore) CreateWorkout(w *Workout) (*Workout, error) {
@@ -116,6 +116,8 @@ func (pg *PostgresWorkoutStore) GetWorkoutByID(id int64) (*Workout, error) {
 
 	rows, err := pg.db.Query(entryQuery, id)
 
+	defer rows.Close()
+
 	for rows.Next() {
 		wEntry := &WorkoutEntry{}
 
@@ -131,6 +133,30 @@ func (pg *PostgresWorkoutStore) GetWorkoutByID(id int64) (*Workout, error) {
 	return w, nil
 }
 
-//func (pg *PostgresWorkoutStore) GetWorkouts() ([]*Workout, error) {
+func (pg *PostgresWorkoutStore) GetWorkouts() ([]Workout, error) {
+	var workouts []Workout
 
-//}
+	query := `
+  SELECT id, title, description, duration_minutes, calories_burned
+  FROM workouts;
+
+  `
+	rows, err := pg.db.Query(query)
+
+	if err != nil {
+		return nil, err
+	}
+
+	for rows.Next() {
+		workout := &Workout{}
+		err := rows.Scan(&workout.ID, &workout.Title, &workout.Description, &workout.DurationMinutes, &workout.CaloriesBurned)
+
+		if err != nil {
+			return nil, err
+		}
+
+		workouts = append(workouts, *workout)
+	}
+
+	return workouts, nil
+}
