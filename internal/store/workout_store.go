@@ -39,7 +39,7 @@ func NewPostgresWorkoutStore(db *sql.DB) *PostgresWorkoutStore {
 type WorkoutStore interface {
 	CreateWorkout(*Workout) (*Workout, error)
 	GetWorkoutByID(id int64) (*Workout, error)
-	GetWorkouts() ([]Workout, error)
+	GetWorkouts() ([]*Workout, error)
 }
 
 func (pg *PostgresWorkoutStore) CreateWorkout(w *Workout) (*Workout, error) {
@@ -107,34 +107,42 @@ func (pg *PostgresWorkoutStore) GetWorkoutByID(id int64) (*Workout, error) {
 		return nil, err
 	}
 
-	entryQuery := `
-  SELECT id, exercise_name, sets, reps, duration_seconds, weight, notes, order_index
-  FROM workout_entries
-  WHERE workout_id = $1
-  ORDER BY order_index
-  `
+	/* entryQuery := `
+	  SELECT id, exercise_name, sets, reps, duration_seconds, weight, notes, order_index
+	  FROM workout_entries
+	  WHERE workout_id = $1
+	  ORDER BY order_index
+	  `
 
-	rows, err := pg.db.Query(entryQuery, id)
+		rows, err := pg.db.Query(entryQuery, id)
 
-	defer rows.Close()
+		defer rows.Close()
 
-	for rows.Next() {
-		wEntry := &WorkoutEntry{}
+		for rows.Next() {
+			wEntry := &WorkoutEntry{}
 
-		err := rows.Scan(&wEntry.ID, &wEntry.ExerciseName, &wEntry.Sets, &wEntry.Reps, &wEntry.DurationSeconds, &wEntry.Weight, &wEntry.Notes, &wEntry.OrderIndex)
+			err := rows.Scan(&wEntry.ID, &wEntry.ExerciseName, &wEntry.Sets, &wEntry.Reps, &wEntry.DurationSeconds, &wEntry.Weight, &wEntry.Notes, &wEntry.OrderIndex)
 
-		if err != nil {
-			return nil, err
-		}
+			if err != nil {
+				return nil, err
+			}
 
-		w.Entries = append(w.Entries, *wEntry)
+			w.Entries = append(w.Entries, *wEntry)
+		} */
+
+	workoutEntries, err := getWorkoutEntriesOfWorkout(pg.db, id)
+
+	if err != nil {
+		return nil, err
 	}
+
+	w.Entries = workoutEntries
 
 	return w, nil
 }
 
-func (pg *PostgresWorkoutStore) GetWorkouts() ([]Workout, error) {
-	var workouts []Workout
+func (pg *PostgresWorkoutStore) GetWorkouts() ([]*Workout, error) {
+	var workouts []*Workout
 
 	query := `
   SELECT id, title, description, duration_minutes, calories_burned
@@ -155,8 +163,51 @@ func (pg *PostgresWorkoutStore) GetWorkouts() ([]Workout, error) {
 			return nil, err
 		}
 
-		workouts = append(workouts, *workout)
+		workouts = append(workouts, workout)
+	}
+
+	for _, w := range workouts {
+		fmt.Print("me ejecuto workout", w.ID)
+		workoutsEntries, err := getWorkoutEntriesOfWorkout(pg.db, int64(w.ID))
+		if err != nil {
+			return nil, err
+		}
+		w.Entries = workoutsEntries
+
 	}
 
 	return workouts, nil
+}
+
+func getWorkoutEntriesOfWorkout(db *sql.DB, id int64) ([]WorkoutEntry, error) {
+	var workoutEntries []WorkoutEntry
+
+	entryQuery := `
+  SELECT id, exercise_name, sets, reps, duration_seconds, weight, notes, order_index
+  FROM workout_entries
+  WHERE workout_id = $1
+  ORDER BY order_index
+  `
+
+	rows, err := db.Query(entryQuery, id)
+
+	if err != nil {
+		return nil, err
+	}
+
+	defer rows.Close()
+
+	for rows.Next() {
+		wEntry := &WorkoutEntry{}
+
+		err := rows.Scan(&wEntry.ID, &wEntry.ExerciseName, &wEntry.Sets, &wEntry.Reps, &wEntry.DurationSeconds, &wEntry.Weight, &wEntry.Notes, &wEntry.OrderIndex)
+
+		if err != nil {
+			return nil, err
+		}
+
+		workoutEntries = append(workoutEntries, *wEntry)
+	}
+
+	return workoutEntries, nil
 }
