@@ -167,7 +167,6 @@ func (pg *PostgresWorkoutStore) GetWorkouts() ([]*Workout, error) {
 	}
 
 	for _, w := range workouts {
-		fmt.Print("me ejecuto workout", w.ID)
 		workoutsEntries, err := getWorkoutEntriesOfWorkout(pg.db, int64(w.ID))
 		if err != nil {
 			return nil, err
