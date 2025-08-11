@@ -38,11 +38,12 @@ func (wh *WorkoutHandler) GetWorkoutByID(w http.ResponseWriter, r *http.Request)
 	workout, err := wh.workoutStore.GetWorkoutByID(workoutID)
 
 	if err != nil {
-		http.NotFound(w, r)
+		http.Error(w, "failed to fetch the workout", http.StatusNotFound)
 		return
 	}
 
 	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(workout)
 }
 
@@ -80,4 +81,64 @@ func (wh *WorkoutHandler) GetWorkouts(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(workouts)
+}
+
+func (wh *WorkoutHandler) UpdateWorkout(w http.ResponseWriter, r *http.Request) {
+	paramID := chi.URLParam(r, "id")
+
+	workoutID, err := strconv.ParseInt(paramID, 10, 64)
+
+	if paramID == "" || err != nil {
+		http.NotFound(w, r)
+		return
+	}
+
+	existingWorkout, err := wh.workoutStore.GetWorkoutByID(workoutID)
+
+	if err != nil {
+		http.Error(w, "failed to fetch workout", http.StatusInternalServerError)
+		return
+	}
+
+	if existingWorkout == nil {
+		http.NotFound(w, r)
+		return
+	}
+
+	var updateWorkoutRequest struct {
+		Title           *string              `json:"title"`
+		Description     *string              `json:"description"`
+		DurationMinutes *int                 `json:"duration_minutes"`
+		CaloriesBurned  *int                 `json:"calories_burned"`
+		Entries         []store.WorkoutEntry `json:"entries"`
+	}
+
+	err = json.NewDecoder(r.Body).Decode(&updateWorkoutRequest)
+
+	if updateWorkoutRequest.Title != nil {
+		existingWorkout.Title = *updateWorkoutRequest.Title
+	}
+	if updateWorkoutRequest.Description != nil {
+		existingWorkout.Description = *updateWorkoutRequest.Description
+	}
+	if updateWorkoutRequest.DurationMinutes != nil {
+		existingWorkout.DurationMinutes = *updateWorkoutRequest.DurationMinutes
+	}
+	if updateWorkoutRequest.CaloriesBurned != nil {
+		existingWorkout.CaloriesBurned = *updateWorkoutRequest.CaloriesBurned
+	}
+	if updateWorkoutRequest.Entries != nil {
+		existingWorkout.Entries = updateWorkoutRequest.Entries
+	}
+
+	err = wh.workoutStore.UpdateWorkout(existingWorkout)
+	if err != nil {
+		http.Error(w, "Ocurrio un error modificando el workout ingresado", http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(existingWorkout)
+
 }
