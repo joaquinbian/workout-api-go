@@ -39,9 +39,7 @@ func (wh *WorkoutHandler) GetWorkoutByID(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(workout)
+	utils.WriteJSON(w, http.StatusOK, utils.Envelope{"workout": workout})
 }
 
 func (wh *WorkoutHandler) CreateWorkout(w http.ResponseWriter, r *http.Request) {
@@ -64,8 +62,7 @@ func (wh *WorkoutHandler) CreateWorkout(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(createdWorkout)
+	utils.WriteJSON(w, http.StatusOK, utils.Envelope{"workout": createdWorkout})
 }
 
 func (wh *WorkoutHandler) GetWorkouts(w http.ResponseWriter, r *http.Request) {
@@ -78,8 +75,7 @@ func (wh *WorkoutHandler) GetWorkouts(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(workouts)
+	utils.WriteJSON(w, http.StatusOK, utils.Envelope{"workouts": workouts})
 }
 
 func (wh *WorkoutHandler) UpdateWorkout(w http.ResponseWriter, r *http.Request) {
@@ -138,9 +134,7 @@ func (wh *WorkoutHandler) UpdateWorkout(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(existingWorkout)
+	utils.WriteJSON(w, http.StatusOK, utils.Envelope{"workout": existingWorkout})
 
 }
 
@@ -167,8 +161,6 @@ func (wh *WorkoutHandler) DeleteWorkout(w http.ResponseWriter, r *http.Request) 
 		utils.WriteJSON(w, http.StatusInternalServerError, utils.Envelope{"message": "error eliminando el workout"})
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode("Workout eliminado")
+	utils.WriteJSON(w, http.StatusOK, utils.Envelope{"message": "workout eliminado"})
 
 }
