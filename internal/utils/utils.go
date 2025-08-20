@@ -34,14 +34,12 @@ func ReadIdParam(w http.ResponseWriter, r *http.Request) (int64, error) {
 	paramID := chi.URLParam(r, "id")
 
 	if paramID == "" {
-		http.NotFound(w, r)
 		return 0, errors.New("no param was provided")
 	}
 
 	id, err := strconv.ParseInt(paramID, 10, 64)
 
 	if err != nil {
-		http.NotFound(w, r)
 		return 0, err
 	}
 

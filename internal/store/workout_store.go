@@ -2,7 +2,6 @@ package store
 
 import (
 	"database/sql"
-	"fmt"
 )
 
 type Workout struct {
@@ -75,7 +74,6 @@ func (pg *PostgresWorkoutStore) CreateWorkout(w *Workout) (*Workout, error) {
 		err = tx.QueryRow(query, w.ID, entry.ExerciseName, entry.Sets, entry.Reps, entry.DurationSeconds, entry.Weight, entry.Notes, entry.OrderIndex).Scan(&entry.ID)
 
 		if err != nil {
-			fmt.Print(err)
 			return nil, err
 		}
 	}
@@ -101,11 +99,10 @@ func (pg *PostgresWorkoutStore) GetWorkoutByID(id int64) (*Workout, error) {
 	err := pg.db.QueryRow(query, id).Scan(&w.ID, &w.Title, &w.Description, &w.DurationMinutes, &w.CaloriesBurned)
 
 	if err == sql.ErrNoRows {
-		return nil, nil
+		return nil, sql.ErrNoRows
 	}
 
 	if err != nil {
-		fmt.Println("err", err)
 		return nil, err
 	}
 
