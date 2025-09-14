@@ -3,11 +3,24 @@ package store
 import (
 	"database/sql"
 	"time"
+
+	"golang.org/x/crypto/bcrypt"
 )
 
 type password struct {
 	text *string
 	hash []byte
+}
+
+func (p *password) Set(plaintextPass string) error {
+	hash, err := bcrypt.GenerateFromPassword([]byte(plaintextPass), 12)
+	if err != nil {
+		return err
+	}
+
+	p.text = &plaintextPass
+	p.hash = hash
+	return nil
 }
 
 type User struct {

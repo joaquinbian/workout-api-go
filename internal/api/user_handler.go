@@ -1,11 +1,14 @@
 package api
 
 import (
+	"encoding/json"
 	"errors"
 	"log"
+	"net/http"
 	"regexp"
 
 	"github.com/joaquinbian/workout-api-go/internal/store"
+	"github.com/joaquinbian/workout-api-go/internal/utils"
 )
 
 type UserHandler struct {
@@ -20,14 +23,14 @@ func NewUserHandler(userStore *store.UserStore, logger *log.Logger) *UserHandler
 	}
 }
 
-type registerUseRequest struct {
+type registerUserRequest struct {
 	Username     string `json:"username"`
 	Email        string `json:"email"`
 	PasswordHash string `json:"password"`
 	Bio          string `json:"bio"`
 }
 
-func (h *UserHandler) validateRegisterUserRequest(userTorRegister *registerUseRequest) error {
+func validateRegisterUserRequest(userTorRegister *registerUserRequest) error {
 	if userTorRegister.Username == "" {
 		return errors.New("username is required")
 	}
@@ -50,4 +53,25 @@ func (h *UserHandler) validateRegisterUserRequest(userTorRegister *registerUseRe
 		return errors.New("password is requried")
 	}
 	return nil
+}
+
+func (h *UserHandler) HandleRegisterUser(w http.ResponseWriter, r *http.Request) {
+	var req registerUserRequest
+
+	err := json.NewDecoder(r.Body).Decode(&req)
+
+	if err != nil {
+		h.logger.Printf("error: decoding register user: %v", err)
+		utils.WriteJSON(w, http.StatusBadRequest, utils.Envelope{"error": "invalid payload"})
+		return
+	}
+
+	user := &store.User{
+		Username: req.Username,
+		Email:    req.Email,
+	}
+
+	if req.Bio != "" {
+		user.Bio = req.Bio
+	}
 }
