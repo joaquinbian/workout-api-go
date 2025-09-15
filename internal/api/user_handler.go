@@ -12,11 +12,11 @@ import (
 )
 
 type UserHandler struct {
-	userStore *store.UserStore
+	userStore store.UserStore
 	logger    *log.Logger
 }
 
-func NewUserHandler(userStore *store.UserStore, logger *log.Logger) *UserHandler {
+func NewUserHandler(userStore store.UserStore, logger *log.Logger) *UserHandler {
 	return &UserHandler{
 		userStore: userStore,
 		logger:    logger,
@@ -24,10 +24,10 @@ func NewUserHandler(userStore *store.UserStore, logger *log.Logger) *UserHandler
 }
 
 type registerUserRequest struct {
-	Username     string `json:"username"`
-	Email        string `json:"email"`
-	PasswordHash string `json:"password"`
-	Bio          string `json:"bio"`
+	Username string `json:"username"`
+	Email    string `json:"email"`
+	Password string `json:"password"`
+	Bio      string `json:"bio"`
 }
 
 func validateRegisterUserRequest(userTorRegister *registerUserRequest) error {
@@ -49,7 +49,7 @@ func validateRegisterUserRequest(userTorRegister *registerUserRequest) error {
 		return errors.New("email is not well formatted")
 	}
 
-	if userTorRegister.PasswordHash == "" {
+	if userTorRegister.Password == "" {
 		return errors.New("password is requried")
 	}
 	return nil
@@ -74,4 +74,21 @@ func (h *UserHandler) HandleRegisterUser(w http.ResponseWriter, r *http.Request)
 	if req.Bio != "" {
 		user.Bio = req.Bio
 	}
+
+	err = user.PasswordHash.Set(req.Password)
+	if err != nil {
+		h.logger.Printf("error: hashing password: %v", err)
+		utils.WriteJSON(w, http.StatusInternalServerError, utils.Envelope{"error": "internal server error"})
+		return
+	}
+
+	err = h.userStore.CreateUser(user)
+
+	if err != nil {
+		h.logger.Printf("error: registe: %v", err)
+		utils.WriteJSON(w, http.StatusInternalServerError, utils.Envelope{"error": "internal server error"})
+		return
+	}
+
+	utils.WriteJSON(w, http.StatusCreated, utils.Envelope{"user": user})
 }
