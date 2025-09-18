@@ -4,8 +4,10 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/joaquinbian/workout-api-go/internal/store"
+	"github.com/joaquinbian/workout-api-go/internal/tokens"
 	"github.com/joaquinbian/workout-api-go/internal/utils"
 )
 
@@ -60,7 +62,13 @@ func (th *TokenHandler) HandleCreateToken(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	token := th.userStore.CreateUser(user)
+	token, err := th.tokenStore.CreateNewToken(user.ID, 24*time.Hour, tokens.ScopeAuth)
+
+	if err != nil {
+		th.logger.Printf("error: HandleCreateToken: creating token: %v", err)
+		utils.WriteJSON(w, http.StatusInternalServerError, utils.Envelope{"error": "iinternal server error"})
+		return
+	}
 
 	utils.WriteJSON(w, http.StatusOK, utils.Envelope{"token": token})
 	return
