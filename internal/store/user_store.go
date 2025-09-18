@@ -96,7 +96,7 @@ func (s *PostgresUserStore) GetUserByUsername(username string) (*User, error) {
 		PasswordHash: password{},
 	}
 
-	query := `SELECT id, username, email, password_hash, bio, created_at, updated_at WHERE username = $1`
+	query := `SELECT id, username, email, password_hash, bio, created_at, updated_at FROM users WHERE username = $1`
 	err := s.db.QueryRow(query, username).Scan(
 		&user.ID,
 		&user.Username,
