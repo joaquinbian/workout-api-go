@@ -66,6 +66,14 @@ func (h *UserHandler) HandleRegisterUser(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
+	err = validateRegisterUserRequest(&req)
+
+	if err != nil {
+		h.logger.Printf("error: register user: %v", err)
+		utils.WriteJSON(w, http.StatusBadRequest, utils.Envelope{"error": "invalid user"})
+		return
+	}
+
 	user := &store.User{
 		Username: req.Username,
 		Email:    req.Email,
