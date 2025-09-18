@@ -43,7 +43,7 @@ func validateRegisterUserRequest(userTorRegister *registerUserRequest) error {
 		return errors.New("email is required")
 	}
 
-	emailRegex := regexp.MustCompile(`^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$ `)
+	emailRegex := regexp.MustCompile(`^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`)
 
 	if !emailRegex.Match([]byte(userTorRegister.Email)) {
 		return errors.New("email is not well formatted")
