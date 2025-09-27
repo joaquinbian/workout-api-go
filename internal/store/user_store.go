@@ -176,7 +176,7 @@ func (us *PostgresUserStore) GetUserToken(scope string, plainText string) (*User
 	query := `SELECT u.id, u.username, u.email, u.password_hash, u.bio, u.created_at, u.updated_at
 	 FROM users u 
 	 INNER JOIN tokens t ON u.id = t.user_id 
-	 WHERE t.hash LIKE $1 AND t.scope LIKE $2 AND t.expirt > $3`
+	 WHERE t.hash LIKE $1 AND t.scope LIKE $2 AND t.expiry > $3`
 
 	err := us.db.QueryRow(query, tokenHash[:], scope, time.Now()).Scan(
 		&user.ID,
@@ -188,7 +188,7 @@ func (us *PostgresUserStore) GetUserToken(scope string, plainText string) (*User
 		&user.UpdatedAt,
 	)
 	if err == sql.ErrNoRows {
-		return nil, nil
+		return nil, err
 	}
 
 	if err != nil {
