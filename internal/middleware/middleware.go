@@ -11,7 +11,7 @@ import (
 )
 
 type UserMiddleware struct {
-	userStore store.UserStore
+	UserStore store.UserStore
 }
 
 // tenemos que usar un tipo custom para evitar colisiones de nombre en el context
@@ -62,7 +62,7 @@ func (um *UserMiddleware) Authenticate(next http.Handler) http.Handler {
 
 		token := headerParts[1]
 
-		user, err := um.userStore.GetUserToken(tokens.ScopeAuth, token)
+		user, err := um.UserStore.GetUserToken(tokens.ScopeAuth, token)
 
 		if err != nil {
 			utils.WriteJSON(w, http.StatusUnauthorized, utils.Envelope{"error": "invalid token"})
@@ -78,4 +78,19 @@ func (um *UserMiddleware) Authenticate(next http.Handler) http.Handler {
 		next.ServeHTTP(w, r)
 		return
 	})
+}
+
+func (um *UserMiddleware) RequireUser(next http.HandlerFunc) http.HandlerFunc {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		user := GetUser(r)
+
+		if user.IsAnonymous() {
+			utils.WriteJSON(w, http.StatusUnauthorized, utils.Envelope{"error": "you must be logged to access this route"})
+			return
+		}
+
+		next.ServeHTTP(w, r)
+		return
+	})
+
 }
