@@ -58,7 +58,7 @@ func (pg *PostgresWorkoutStore) CreateWorkout(w *Workout) (*Workout, error) {
 	defer tx.Rollback()
 
 	query := `INSERT INTO workouts (title, user_id, description, duration_minutes, calories_burned)
-	VALUES($1, $2, $3, $4)
+	VALUES($1, $2, $3, $4, $5)
 	RETURNING id
 	`
 	//Scan es el mecanismo que copia y convierte las columnas de la query en tus variables Go.

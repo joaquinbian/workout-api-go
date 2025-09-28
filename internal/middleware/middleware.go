@@ -43,9 +43,8 @@ func (um *UserMiddleware) Authenticate(next http.Handler) http.Handler {
 
 		//aqui podemos interceptar cualquier request entrante a nuestro server
 		//The Vary HTTP header is used to inform caches about which request headers influence the response content
-		w.Header().Set("Vary", "Authorization")
-
-		authHeader := w.Header().Get("Authorization")
+		w.Header().Add("Vary", "Authorization")
+		authHeader := r.Header.Get("Authorization")
 
 		if authHeader == "" {
 			r = SetUser(r, store.AnonymousUser)
