@@ -6,6 +6,7 @@ import (
 
 type Workout struct {
 	ID              int            `json:"id"`
+	UserID          int            `json:"user_id"`
 	Title           string         `json:"title"`
 	Description     string         `json:"description"`
 	DurationMinutes int            `json:"duration_minutes"`
@@ -40,6 +41,7 @@ type WorkoutStore interface {
 	GetWorkoutByID(id int64) (*Workout, error)
 	GetWorkouts() ([]*Workout, error)
 	UpdateWorkout(*Workout) error
+	GetWorkoutOwner(id int64) (int, error)
 	DeleteWorkout(id int64) error
 }
 
@@ -55,13 +57,13 @@ func (pg *PostgresWorkoutStore) CreateWorkout(w *Workout) (*Workout, error) {
 	//hace rollback
 	defer tx.Rollback()
 
-	query := `INSERT INTO workouts (title, description, duration_minutes, calories_burned)
+	query := `INSERT INTO workouts (title, user_id, description, duration_minutes, calories_burned)
 	VALUES($1, $2, $3, $4)
 	RETURNING id
 	`
 	//Scan es el mecanismo que copia y convierte las columnas de la query en tus variables Go.
 	//En .Scan(&w.ID) cada argumento debe ser un puntero a la variable donde querés guardar la columna.
-	err = tx.QueryRow(query, w.Title, w.Description, w.DurationMinutes, w.CaloriesBurned).Scan(&w.ID)
+	err = tx.QueryRow(query, w.Title, w.UserID, w.Description, w.DurationMinutes, w.CaloriesBurned).Scan(&w.ID)
 	if err != nil {
 		return nil, err
 	}
@@ -234,6 +236,25 @@ func (pg *PostgresWorkoutStore) DeleteWorkout(id int64) error {
 
 	return nil
 
+}
+
+func (pg *PostgresWorkoutStore) GetWorkoutOwner(workoutID int64) (int, error) {
+
+	query := `SELECT user_id FROM workouts WHERE id = $1`
+
+	var id int
+
+	err := pg.db.QueryRow(query, workoutID).Scan(&id)
+
+	if err != nil {
+		return -1, err
+	}
+
+	if err == sql.ErrNoRows {
+		return -1, err
+	}
+
+	return id, nil
 }
 
 // ver de poner esta en otro archivo
